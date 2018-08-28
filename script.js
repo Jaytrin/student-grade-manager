@@ -5,11 +5,13 @@
 /**
  * Listen for the document to load and initialize the application
  */
-$(document).ready();
+$(document).ready(initializeApp);
 
 /**
  * Define all global variables here.  
  */
+var student_array = [];
+
 /***********************
  * student_array - global array to hold student objects
  * @type {Array}
@@ -27,15 +29,21 @@ $(document).ready();
 * initializes the application, including adding click handlers and pulling in any data from the server, in later versions
 */
 function initializeApp(){
+    console.log('initialized');
+    addClickHandlersToElements();
 }
+
 
 /***************************************************************************************************
 * addClickHandlerstoElements
-* @params {undefined} 
+* @params {undefined}
 * @returns  {undefined}
-*     
+*
 */
 function addClickHandlersToElements(){
+    console.log('addClickHandlersToElements running');
+    $('button.btn.btn-success').click(handleAddClicked);
+    $('button.btn.btn-default').click(handleCancelClick);
 }
 
 /***************************************************************************************************
@@ -45,6 +53,9 @@ function addClickHandlersToElements(){
        none
  */
 function handleAddClicked(){
+    console.log('handleAddClicked running');
+    addStudent();
+
 }
 /***************************************************************************************************
  * handleCancelClicked - Event Handler when user clicks the cancel button, should clear out student form
@@ -53,6 +64,8 @@ function handleAddClicked(){
  * @calls: clearAddStudentFormInputs
  */
 function handleCancelClick(){
+    console.log('handleCancelClick running');
+    clearAddStudentFormInputs();
 }
 /***************************************************************************************************
  * addStudent - creates a student objects based on input fields in the form and adds the object to global student array
@@ -61,18 +74,35 @@ function handleCancelClick(){
  * @calls clearAddStudentFormInputs, updateStudentList
  */
 function addStudent(){
+    console.log('addStudent running');
+    var student_object = {name: $('#studentName').val(),
+                            course: $('#course').val(),
+                            grade: $('#studentGrade').val()};
+    student_array.push(student_object);
+    clearAddStudentFormInputs();
+    updateStudentList(student_array);
 }
 /***************************************************************************************************
  * clearAddStudentForm - clears out the form values based on inputIds variable
  */
 function clearAddStudentFormInputs(){
+    console.log('clearAddStudentFormInputs running');
+    $('#studentName').val("");
+    $('#course').val("");
+    $('#studentGrade').val("");
 }
 /***************************************************************************************************
  * renderStudentOnDom - take in a student object, create html elements from the values and then append the elements
  * into the .student_list tbody
  * @param {object} studentObj a single student object with course, name, and grade inside
  */
-function renderStudentOnDom(){
+function renderStudentOnDom(studentObj){
+    console.log('renderStudentOnDom running');
+    var studentNameElement = $('<td>').text(studentObj.name);
+    var studentCourseElement = $('<td>').text(studentObj.course);
+    var studentGradeElement = $('<td>').text(studentObj.grade);
+    var newStudentData = $('<tr>').append(studentNameElement, studentCourseElement, studentGradeElement);
+    $('.student-list tbody').append(newStudentData);
 }
 
 /***************************************************************************************************
@@ -81,24 +111,35 @@ function renderStudentOnDom(){
  * @returns {undefined} none
  * @calls renderStudentOnDom, calculateGradeAverage, renderGradeAverage
  */
-function updateStudentList(){
-  
+function updateStudentList(students){
+    console.log('updateStudentList running');
+    renderStudentOnDom(students[students.length - 1]);
+    renderGradeAverage(calculateGradeAverage(students));
 }
 /***************************************************************************************************
  * calculateGradeAverage - loop through the global student array and calculate average grade and return that value
  * @param: {array} students  the array of student objects
  * @returns {number}
  */
-function calculateGradeAverage(){
+function calculateGradeAverage(array){
+    console.log('calculateGradeAverage running');
+    var studentGradeSum = 0;
+    for (var studentIndex = 0; studentIndex < array.length; studentIndex++){
+        studentGradeSum = parseInt(studentGradeSum) + parseInt(array[studentIndex].grade);
+    }
+    var result = studentGradeSum / array.length;
+    return result;
 }
 /***************************************************************************************************
  * renderGradeAverage - updates the on-page grade average
  * @param: {number} average    the grade average
  * @returns {undefined} none
  */
-function renderGradeAverage(){
+function renderGradeAverage(average) {
+    console.log('renderGradeAverage running');
+    var roundedAverage = Math.round(average);
+    $('.avgGrade.label.label-default').text(roundedAverage);
 }
-
 
 
 
