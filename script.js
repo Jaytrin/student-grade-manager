@@ -11,7 +11,6 @@ $(document).ready(initializeApp);
  * Define all global variables here.  
  */
 var student_array = [];
-var student_object = {};
 
 /***********************
  * student_array - global array to hold student objects
@@ -76,9 +75,9 @@ function handleCancelClick(){
  */
 function addStudent(){
     console.log('addStudent running');
-    student_object.name = $('#studentName').val();
-    student_object.course= $('#course').val();
-    student_object.grade = $('#studentGrade').val();
+    var student_object = {name: $('#studentName').val(),
+                            course: $('#course').val(),
+                            grade: $('#studentGrade').val()};
     student_array.push(student_object);
     clearAddStudentFormInputs();
     updateStudentList(student_array);
@@ -136,12 +135,11 @@ function calculateGradeAverage(array){
  * @param: {number} average    the grade average
  * @returns {undefined} none
  */
-function renderGradeAverage(average){
+function renderGradeAverage(average) {
     console.log('renderGradeAverage running');
-    var gradeAverageElement = $('<td>').text(average);
-    $('.avgGrade.label.label-default').append(gradeAverageElement);
+    var roundedAverage = Math.round(average);
+    $('.avgGrade.label.label-default').text(roundedAverage);
 }
-
 
 
 
