@@ -101,8 +101,20 @@ function renderStudentOnDom(studentObj){
     var studentNameElement = $('<td>').text(studentObj.name);
     var studentCourseElement = $('<td>').text(studentObj.course);
     var studentGradeElement = $('<td>').text(studentObj.grade);
-    var newStudentData = $('<tr>').append(studentNameElement, studentCourseElement, studentGradeElement);
+
+    var deleteButton = $('<button>').addClass('btn btn-danger').text('Delete');
+    var deleteButtonTD = $('<td>').append(deleteButton);
+    var newStudentData = $('<tr>').append(studentNameElement, studentCourseElement, studentGradeElement, deleteButtonTD);
+
     $('.student-list tbody').append(newStudentData);
+
+    deleteButton.click(function(){
+        var studentIndex = student_array.indexOf(studentObj);
+        student_array.splice(studentIndex,1);
+        $(this).parents('tr').remove();
+    })
+
+
 }
 
 /***************************************************************************************************
@@ -140,7 +152,3 @@ function renderGradeAverage(average) {
     var roundedAverage = Math.round(average);
     $('.avgGrade.label.label-default').text(roundedAverage);
 }
-
-
-
-
