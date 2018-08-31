@@ -127,10 +127,10 @@ function renderStudentOnDom(studentObj){
 function updateStudentList(students){
     console.log('updateStudentList running');
 
-    for(var i = 0; )
-
-    renderStudentOnDom(students[students.length - 1]);
-    renderGradeAverage(calculateGradeAverage(students));
+    for(var i = 0; i < students.length; i++){
+        renderStudentOnDom(students[i]);
+        renderGradeAverage(calculateGradeAverage(students));
+    }
 }
 /***************************************************************************************************
  * calculateGradeAverage - loop through the global student array and calculate average grade and return that value
