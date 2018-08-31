@@ -126,6 +126,9 @@ function renderStudentOnDom(studentObj){
  */
 function updateStudentList(students){
     console.log('updateStudentList running');
+
+    for(var i = 0; )
+
     renderStudentOnDom(students[students.length - 1]);
     renderGradeAverage(calculateGradeAverage(students));
 }
@@ -174,7 +177,7 @@ function getData(returnedObject){
         method: 'post',
         data: {api_key: 'wLeMnZ7QcV'},
         success:
-            (function (){function(returnedObject) {
+            function(returnedObject) {
             console.log('Success');
             console.log('result', returnedObject);
 
@@ -184,12 +187,13 @@ function getData(returnedObject){
                     course: returnedObject.data[i].course,
                     grade: returnedObject.data[i].grade
                 };
+                student_array.push(student_object);
             }
-            student_array.push(student_object);
+
             updateStudentList(student_array);
 
 
-        }})(),
+        },
         error: function(){
             console.log('Failure');
         }}
