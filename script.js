@@ -44,6 +44,7 @@ function addClickHandlersToElements(){
     console.log('addClickHandlersToElements running');
     $('button.btn.btn-success').click(handleAddClicked);
     $('button.btn.btn-default').click(handleCancelClick);
+    $('button.btn.btn-primary').click(handleGetDataClick);
 }
 
 /***************************************************************************************************
@@ -125,8 +126,11 @@ function renderStudentOnDom(studentObj){
  */
 function updateStudentList(students){
     console.log('updateStudentList running');
-    renderStudentOnDom(students[students.length - 1]);
-    renderGradeAverage(calculateGradeAverage(students));
+
+    for(var i = 0; i < students.length; i++){
+        renderStudentOnDom(students[i]);
+        renderGradeAverage(calculateGradeAverage(students));
+    }
 }
 /***************************************************************************************************
  * calculateGradeAverage - loop through the global student array and calculate average grade and return that value
@@ -152,3 +156,50 @@ function renderGradeAverage(average) {
     var roundedAverage = Math.round(average);
     $('.avgGrade.label.label-default').text(roundedAverage);
 }
+/***************************************************************************************************
+ * handleGetDataClick - Event Handler when user clicks the get data button, should pull records from DB
+ * @param: {undefined} none
+ * @returns: {undefined} none
+ * @calls: getData
+ */
+
+function handleGetDataClick(){
+    console.log('handleGetDataClick running');
+    getData();
+}
+
+function getData(returnedObject){
+    console.log('get data running');
+
+    var ajaxConfig = {
+        dataType: 'json',
+        url: 'http://s-apis.learningfuze.com/sgt/get',
+        method: 'post',
+        data: {api_key: 'wLeMnZ7QcV'},
+        success:
+            function(returnedObject) {
+            console.log('Success');
+            console.log('result', returnedObject);
+
+            for (var i = 0; i < returnedObject.data.length; i++) {
+                var student_object = {
+                    name: returnedObject.data[i].name,
+                    course: returnedObject.data[i].course,
+                    grade: returnedObject.data[i].grade
+                };
+                student_array.push(student_object);
+            }
+
+            updateStudentList(student_array);
+
+
+        },
+        error: function(){
+            console.log('Failure');
+        }}
+
+    $.ajax(ajaxConfig);
+    }
+
+
+
