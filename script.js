@@ -11,6 +11,7 @@ $(document).ready(initializeApp);
  * Define all global variables here.  
  */
 var student_array = [];
+var student_id;
 
 /***********************
  * student_array - global array to hold student objects
@@ -31,6 +32,7 @@ var student_array = [];
 function initializeApp(){
     console.log('initialized');
     addClickHandlersToElements();
+    getData();
 }
 
 
@@ -80,6 +82,7 @@ function addStudent(){
                             course: $('#course').val(),
                             grade: $('#studentGrade').val()};
     student_array.push(student_object);
+    sendData(student_object);
     clearAddStudentFormInputs();
     updateStudentList(student_array);
 }
@@ -111,6 +114,7 @@ function renderStudentOnDom(studentObj){
 
     deleteButton.click(function(){
         var studentIndex = student_array.indexOf(studentObj);
+        removeData(studentObj);
         student_array.splice(studentIndex,1);
         $(this).parents('tr').remove();
     })
@@ -183,6 +187,7 @@ function getData(returnedObject){
 
             for (var i = 0; i < returnedObject.data.length; i++) {
                 var student_object = {
+                    id: returnedObject.data[i].id,
                     name: returnedObject.data[i].name,
                     course: returnedObject.data[i].course,
                     grade: returnedObject.data[i].grade
@@ -201,5 +206,47 @@ function getData(returnedObject){
     $.ajax(ajaxConfig);
     }
 
+function sendData(createdObject){
+    console.log('Sending Data to Server');
 
+    var ajaxConfig = {
+        dataType: 'json',
+        url: 'http://s-apis.learningfuze.com/sgt/create',
+        method: 'post',
+        data: {api_key: 'wLeMnZ7QcV',
+                name: createdObject.name,
+                course: createdObject.course,
+                grade: createdObject.grade},
+        success:
+            function(returnedObject){
+            console.log('Send Data Success');
+            var newStudentID = returnedObject.new_id;
+            console.log('student ID:', newStudentID);
+            createdObject.id = newStudentID;
+            return createdObject;
+            },
+        error:
+            function(){
+            console.log('Send Data Error');
+            }
+    }
+    $.ajax(ajaxConfig);
+}
 
+function removeData(createdObject){
+    console.log('RemoveData Running');
+    var ajaxConfig = {
+        dataType: 'json',
+        url: 'http://s-apis.learningfuze.com/sgt/delete',
+        method: 'post',
+        data: {api_key: 'wLeMnZ7QcV',
+            student_id: createdObject.id},
+        success: function(){
+            console.log('Removing Data from Server Succeeded')
+        },
+        error: function(){
+            console.log('Removing Data from Server Failed')
+        }
+    }
+    $.ajax(ajaxConfig);
+}
