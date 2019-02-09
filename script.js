@@ -42,7 +42,7 @@ function initializeApp(){
 */
 function addClickHandlersToElements(){
     console.log('addClickHandlersToElements running');
-    $('button.btn.btn-success').click(handleAddClicked);
+    $('button.btn.btn-success').click(handleSubmitClicked);
     $('button.btn.btn-default').click(handleCancelClick);
     $('button.btn.btn-primary').click(handleGetDataClick);
 }
@@ -53,9 +53,9 @@ function addClickHandlersToElements(){
  * @return: 
        none
  */
-function handleAddClicked(){
-    console.log('handleAddClicked running');
-    addStudent();
+function handleSubmitClicked(){
+    console.log('submitData running');
+    submitData();
 
 }
 /***************************************************************************************************
@@ -69,18 +69,32 @@ function handleCancelClick(){
     clearAddStudentFormInputs();
 }
 /***************************************************************************************************
- * addStudent - creates a student objects based on input fields in the form and adds the object to global student array
+ * submitData - creates a student objects based on input fields in the form and adds the object to global student array
  * @param {undefined} none
  * @return undefined
  * @calls clearAddStudentFormInputs, updateStudentList
  */
-function addStudent(){
-    console.log('addStudent running');
-    var student_object = {name: $('#studentName').val(),
-                            course: $('#course').val(),
-                            grade: $('#studentGrade').val()};
-    student_array.push(student_object);
-    clearAddStudentFormInputs();
+function submitData(){
+    console.log('submitData running');
+    var studentObject = {
+        student: $('#studentName').val(),
+        course: $('#course').val(),
+        grade: $('#studentGrade').val()
+    };
+
+    $.ajax({
+        type:'POST',
+        url: 'http://localhost:8888/app.php/?request=submit_data',
+        data: {
+            student: studentObject.student,
+            course: studentObject.course,
+            grade: studentObject.grade
+        },
+        dataType: 'json',
+        success: messageSent()
+    })
+
+    student_array.push(studentObject);
     updateStudentList(student_array);
 }
 /***************************************************************************************************
@@ -99,7 +113,7 @@ function clearAddStudentFormInputs(){
  */
 function renderStudentOnDom(studentObj){
     console.log('renderStudentOnDom running');
-    var studentNameElement = $('<td>').text(studentObj.name);
+    var studentNameElement = $('<td>').text(studentObj.student);
     var studentCourseElement = $('<td>').text(studentObj.course);
     var studentGradeElement = $('<td>').text(studentObj.grade);
 
@@ -125,8 +139,8 @@ function renderStudentOnDom(studentObj){
  * @calls renderStudentOnDom, calculateGradeAverage, renderGradeAverage
  */
 function updateStudentList(students){
+    $('.student-list tbody').empty();
     console.log('updateStudentList running');
-
     for(var i = 0; i < students.length; i++){
         renderStudentOnDom(students[i]);
         renderGradeAverage(calculateGradeAverage(students));
@@ -168,31 +182,33 @@ function handleGetDataClick(){
     getData();
 }
 
-function getData(returnedObject){
+/***************************************************************************************************
+ * getData - Functino that gets data from the database
+ * @param: {undefined} none
+ * @returns: {undefined} none
+ * @calls: updateStudentList
+ */
+function getData(){
     console.log('get data running');
-
+    student_array = [];
     var ajaxConfig = {
         dataType: 'json',
-        url: 'http://s-apis.learningfuze.com/sgt/get',
-        method: 'post',
-        data: {api_key: 'wLeMnZ7QcV'},
+        url: 'http://localhost:8888/app.php/?request=get_data',
+        method: 'get',
         success:
             function(returnedObject) {
             console.log('Success');
             console.log('result', returnedObject);
 
-            for (var i = 0; i < returnedObject.data.length; i++) {
+            for (var i = 0; i < returnedObject.length; i++) {
                 var student_object = {
-                    name: returnedObject.data[i].name,
-                    course: returnedObject.data[i].course,
-                    grade: returnedObject.data[i].grade
+                    student: returnedObject[i].student,
+                    course: returnedObject[i].course,
+                    grade: returnedObject[i].grade
                 };
                 student_array.push(student_object);
             }
-
             updateStudentList(student_array);
-
-
         },
         error: function(){
             console.log('Failure');
@@ -201,5 +217,14 @@ function getData(returnedObject){
     $.ajax(ajaxConfig);
     }
 
+/***************************************************************************************************
+ * messageSent - confirms a successful submission of student data.
+ * @param: {undefined} none
+ * @returns: {undefined} none
+ * @calls:
+ */
 
-
+ function messageSent(){
+     console.log('Student data successfully sent.');
+     clearAddStudentFormInputs();
+ }
