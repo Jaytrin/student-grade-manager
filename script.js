@@ -116,14 +116,25 @@ function renderStudentOnDom(studentObj){
     var studentNameElement = $('<td>').text(studentObj.student);
     var studentCourseElement = $('<td>').text(studentObj.course);
     var studentGradeElement = $('<td>').text(studentObj.grade);
+    var studentID = studentObj.ID;
 
-    var deleteButton = $('<button>').addClass('btn btn-danger').text('Delete');
+    var deleteButton = $('<button>').addClass('btn btn-danger').attr('id',studentID).text('Delete');
     var deleteButtonTD = $('<td>').append(deleteButton);
     var newStudentData = $('<tr>').append(studentNameElement, studentCourseElement, studentGradeElement, deleteButtonTD);
 
     $('.student-list tbody').append(newStudentData);
 
-    deleteButton.click(function(){
+    $('#'+studentID).click(function(){
+
+        $.ajax({
+            type:'POST',
+            url: 'http://localhost:8888/app.php/?request=delete_data',
+            data: {
+               ID:studentID
+            },
+            dataType: 'json'
+        })
+
         var studentIndex = student_array.indexOf(studentObj);
         student_array.splice(studentIndex,1);
         $(this).parents('tr').remove();
@@ -202,6 +213,7 @@ function getData(){
 
             for (var i = 0; i < returnedObject.length; i++) {
                 var student_object = {
+                    ID: returnedObject[i].ID,
                     student: returnedObject[i].student,
                     course: returnedObject[i].course,
                     grade: returnedObject[i].grade
