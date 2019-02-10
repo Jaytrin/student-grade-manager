@@ -42,9 +42,9 @@ function initializeApp(){
 */
 function addClickHandlersToElements(){
     console.log('addClickHandlersToElements running');
-    $('button.btn.btn-success').click(handleSubmitClicked);
-    $('button.btn.btn-default').click(handleCancelClick);
-    $('button.btn.btn-primary').click(handleGetDataClick);
+    $('#submitData').on('click',handleSubmitClicked);
+    $('#cancel').on('click',handleCancelClick);
+    $('#getData').on('click',handleGetDataClick);
 }
 
 /***************************************************************************************************
@@ -118,28 +118,17 @@ function renderStudentOnDom(studentObj){
     var studentGradeElement = $('<td>').text(studentObj.grade);
     var studentID = studentObj.ID;
 
-    var deleteButton = $('<button>').addClass('btn btn-danger').attr('id',studentID).text('Delete');
-    var deleteButtonTD = $('<td>').append(deleteButton);
-    var newStudentData = $('<tr>').append(studentNameElement, studentCourseElement, studentGradeElement, deleteButtonTD);
+    var deleteButton = $('<i>').addClass('fas fa-trash-alt ml-2 deleteBtn');
+    var editButton = $('<i>').addClass('fas fa-edit mr-2 editBtn');
+
+    var buttonTD = $('<td>').append(editButton, deleteButton);
+
+    var newStudentData = $('<tr>').addClass('text-center').append(studentNameElement, studentCourseElement, studentGradeElement, buttonTD).attr('id',studentID);;
 
     $('.student-list tbody').append(newStudentData);
 
-    $('#'+studentID).click(function(){
-
-        $.ajax({
-            type:'POST',
-            url: 'http://localhost:8888/app.php/?request=delete_data',
-            data: {
-               ID:studentID
-            },
-            dataType: 'json'
-        })
-
-        var studentIndex = student_array.indexOf(studentObj);
-        student_array.splice(studentIndex,1);
-        $(this).parents('tr').remove();
-    })
-
+    updateClickHandlers();
+    highlightSection();
 
 }
 
@@ -240,3 +229,116 @@ function getData(){
      console.log('Student data successfully sent.');
      clearAddStudentFormInputs();
  }
+
+ /***************************************************************************************************
+ * highlightSection - Clears all previous highlights and highlights current section
+ * @param: {undefined} none
+ * @returns: {undefined} none
+ * @calls:
+ */
+
+ function highlightSection(){
+    $('tr').off();
+    $('tr').on('click',function() {
+        var highlighted = $(this).hasClass("highlight");
+        $('tr').removeClass("highlight");
+        if(!highlighted)
+                $(this).addClass("highlight");
+    });
+}
+
+ /***************************************************************************************************
+ * updateClickHandlers - Updates click hanlders
+ * @param: {undefined} none
+ * @returns: {undefined} none
+ * @calls:
+ */
+
+function updateClickHandlers(){
+    $('.deleteBtn').off();
+    $('.editBtn').off();
+    $('.deleteBtn').on('click',function(){
+        console.log('deleting..');
+        $.ajax({
+            type:'POST',
+            url: 'http://localhost:8888/app.php/?request=delete_data',
+            data: {
+               ID:studentID
+            },
+            dataType: 'json'
+        })
+
+        var studentIndex = student_array.indexOf(studentObj);
+        student_array.splice(studentIndex,1);
+        $(this).parents('tr').remove();
+    });
+
+    $('.editBtn').on('click',function(event){
+        // console.log('this: ',$(this).parent().val());
+        console.log('edit BTN clicked');
+        var studentID = getStudentID(event.target);
+        var student = $('#' + studentID + ' td:nth-child(1)').text();
+        var course =  $('#' + studentID + ' td:nth-child(2)').text();
+        var grade =  $('#' + studentID + ' td:nth-child(3)').text();
+
+        $('#studentName').val(student),
+        $('#course').val(course),
+        $('#studentGrade').val(grade)
+        $('#submitData').text('Update');
+        $('#submitData').removeClass('btn-primary');
+        $('#submitData').addClass('btn-info');
+        $('#submitData').off();
+        $('#submitData').on('click',()=> {
+            updateData(studentID);
+        });
+        
+});
+
+function getStudentID(e){
+    var studentID = $(e).parent().parent().attr('id');
+    return studentID;
+}
+
+function updateData(studentID){
+
+var studentObject = updateStudentObject();
+
+    $.ajax({
+        type:'POST',
+        url: 'http://localhost:8888/app.php/?request=update_data',
+        data: {
+        ID:studentID,
+        student:studentObject.student,
+        course:studentObject.course,
+        grade:studentObject.grade
+        },
+        dataType: 'json'
+}).then(changeSubmitButton);
+}
+
+function changeSubmitButton(){
+    $('#submitData').off();
+    $('#submitData').on('click',handleSubmitClicked);
+    $('#submitData').removeClass('btn-info');
+    $('#submitData').addClass('btn-primary');
+    $('#submitData').text('Submit');
+    $('#studentName').val('');
+    $('#course').val('');
+    $('#studentGrade').val('');
+    getData();
+}
+
+function updateStudentObject(){
+    var student = $('#studentName').val();
+    var course = $('#course').val();
+    var grade = $('#studentGrade').val();
+
+    var studentObect = {
+        student: student,
+        course: course,
+        grade: grade
+    };
+    return studentObect;
+}
+
+}
