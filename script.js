@@ -56,7 +56,6 @@ function addClickHandlersToElements(){
 function handleSubmitClicked(){
     console.log('submitData running');
     submitData();
-
 }
 /***************************************************************************************************
  * handleCancelClicked - Event Handler when user clicks the cancel button, should clear out student form
@@ -67,7 +66,28 @@ function handleSubmitClicked(){
 function handleCancelClick(){
     console.log('handleCancelClick running');
     clearAddStudentFormInputs();
+    changeUpdateButton();
 }
+
+ /***************************************************************************************************
+ * updateStudentObject - updates the student Object based on current values on form
+ * @param: {undefined} none
+ * @returns: {undefined} none
+ * @calls:
+ */
+function updateStudentObject(){
+    var student = $('#studentName').val();
+    var course = $('#course').val();
+    var grade = $('#studentGrade').val();
+
+    var studentObject = {
+        student: student,
+        course: course,
+        grade: grade
+    };
+    return studentObject;
+}
+
 /***************************************************************************************************
  * submitData - creates a student objects based on input fields in the form and adds the object to global student array
  * @param {undefined} none
@@ -76,11 +96,8 @@ function handleCancelClick(){
  */
 function submitData(){
     console.log('submitData running');
-    var studentObject = {
-        student: $('#studentName').val(),
-        course: $('#course').val(),
-        grade: $('#studentGrade').val()
-    };
+    debugger;
+    var studentObject = updateStudentObject();
 
     $.ajax({
         type:'POST',
@@ -129,7 +146,6 @@ function renderStudentOnDom(studentObj){
 
     updateClickHandlers();
     highlightSection();
-
 }
 
 /***************************************************************************************************
@@ -143,8 +159,8 @@ function updateStudentList(students){
     console.log('updateStudentList running');
     for(var i = 0; i < students.length; i++){
         renderStudentOnDom(students[i]);
-        renderGradeAverage(calculateGradeAverage(students));
     }
+    renderGradeAverage(calculateGradeAverage(students));
 }
 /***************************************************************************************************
  * calculateGradeAverage - loop through the global student array and calculate average grade and return that value
@@ -165,7 +181,7 @@ function calculateGradeAverage(array){
  * @param: {number} average    the grade average
  * @returns {undefined} none
  */
-function renderGradeAverage(average) {
+function renderGradeAverage(average){
     console.log('renderGradeAverage running');
     var roundedAverage = Math.round(average);
     $('.avgGrade.label.label-default').text(roundedAverage);
@@ -236,14 +252,15 @@ function getData(){
  * @returns: {undefined} none
  * @calls:
  */
-
  function highlightSection(){
     $('tr').off();
-    $('tr').on('click',function() {
+    $('tr').on('click',function(){
         var highlighted = $(this).hasClass("highlight");
+        var mainHeader = $(this).hasClass("main-headers");
         $('tr').removeClass("highlight");
-        if(!highlighted)
-                $(this).addClass("highlight");
+        if(!mainHeader && !highlighted){
+            $(this).addClass("highlight");
+            }
     });
 }
 
@@ -251,14 +268,15 @@ function getData(){
  * updateClickHandlers - Updates click hanlders
  * @param: {undefined} none
  * @returns: {undefined} none
- * @calls:
+ * @calls: changeUpdateButton
  */
 
 function updateClickHandlers(){
     $('.deleteBtn').off();
     $('.editBtn').off();
-    $('.deleteBtn').on('click',function(){
+    $('.deleteBtn').on('click',function(event){
         console.log('deleting..');
+        var studentID = getStudentID(event.target);
         $.ajax({
             type:'POST',
             url: 'http://localhost:8888/app.php/?request=delete_data',
@@ -266,15 +284,11 @@ function updateClickHandlers(){
                ID:studentID
             },
             dataType: 'json'
-        })
+        }).then(getData);
 
-        var studentIndex = student_array.indexOf(studentObj);
-        student_array.splice(studentIndex,1);
-        $(this).parents('tr').remove();
     });
 
     $('.editBtn').on('click',function(event){
-        // console.log('this: ',$(this).parent().val());
         console.log('edit BTN clicked');
         var studentID = getStudentID(event.target);
         var student = $('#' + studentID + ' td:nth-child(1)').text();
@@ -284,25 +298,30 @@ function updateClickHandlers(){
         $('#studentName').val(student),
         $('#course').val(course),
         $('#studentGrade').val(grade)
-        $('#submitData').text('Update');
-        $('#submitData').removeClass('btn-primary');
-        $('#submitData').addClass('btn-info');
-        $('#submitData').off();
-        $('#submitData').on('click',()=> {
-            updateData(studentID);
-        });
-        
+        changeUpdateButton(studentID);
+
 });
+}
+ /***************************************************************************************************
+ * getStudentID - Gets student ID
+ * @param: event
+ * @returns: {undefined} none
+ * @calls: 
+ */
 
 function getStudentID(e){
     var studentID = $(e).parent().parent().attr('id');
     return studentID;
 }
 
+ /***************************************************************************************************
+ * updateData - Updates data and displays updates
+ * @param: studentID
+ * @returns: {undefined} none
+ * @calls: updateStudentObject,clearAddStudentFormInputs, changeSubmitButton, getData
+ */
 function updateData(studentID){
-
-var studentObject = updateStudentObject();
-
+    var studentObject = updateStudentObject();
     $.ajax({
         type:'POST',
         url: 'http://localhost:8888/app.php/?request=update_data',
@@ -313,32 +332,40 @@ var studentObject = updateStudentObject();
         grade:studentObject.grade
         },
         dataType: 'json'
-}).then(changeSubmitButton);
+}).then(()=>{
+    clearAddStudentFormInputs();
+    changeSubmitButton();
+    getData();
+    });
 }
 
+ /***************************************************************************************************
+ * changeSubmitButton - Changes button back to submit button
+ * @param: {undefined} none
+ * @returns: {undefined} none
+ * @calls:
+ */
 function changeSubmitButton(){
     $('#submitData').off();
     $('#submitData').on('click',handleSubmitClicked);
     $('#submitData').removeClass('btn-info');
     $('#submitData').addClass('btn-primary');
     $('#submitData').text('Submit');
-    $('#studentName').val('');
-    $('#course').val('');
-    $('#studentGrade').val('');
-    getData();
+}
+ /***************************************************************************************************
+ * changeUpdateButton - Changes button back to update button
+ * @param: {undefined} none
+ * @returns: {undefined} none
+ * @calls:
+ */
+function changeUpdateButton(studentID){
+    $('#submitData').off();
+    $('#submitData').removeClass('btn-primary');
+    $('#submitData').addClass('btn-info');
+    $('#submitData').text('Update');
+    $('#submitData').on('click',()=> {
+        updateData(studentID);
+    });
 }
 
-function updateStudentObject(){
-    var student = $('#studentName').val();
-    var course = $('#course').val();
-    var grade = $('#studentGrade').val();
 
-    var studentObect = {
-        student: student,
-        course: course,
-        grade: grade
-    };
-    return studentObect;
-}
-
-}
