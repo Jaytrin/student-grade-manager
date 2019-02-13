@@ -29,7 +29,6 @@ var student_array = [];
 * initializes the application, including adding click handlers and pulling in any data from the server, in later versions
 */
 function initializeApp(){
-    console.log('initialized');
     addClickHandlersToElements();
 }
 
@@ -41,7 +40,6 @@ function initializeApp(){
 *
 */
 function addClickHandlersToElements(){
-    console.log('addClickHandlersToElements running');
     $('#submitData').on('click',handleSubmitClicked);
     $('#cancel').on('click',handleCancelClick);
     $('#getData').on('click',handleGetDataClick);
@@ -54,7 +52,6 @@ function addClickHandlersToElements(){
        none
  */
 function handleSubmitClicked(){
-    console.log('submitData running');
     submitData();
 }
 /***************************************************************************************************
@@ -64,9 +61,9 @@ function handleSubmitClicked(){
  * @calls: clearAddStudentFormInputs
  */
 function handleCancelClick(){
-    console.log('handleCancelClick running');
     clearAddStudentFormInputs();
-    changeUpdateButton();
+    changeSubmitButton();
+    clearInputWarning();
 }
 
  /***************************************************************************************************
@@ -95,10 +92,10 @@ function updateStudentObject(){
  * @calls clearAddStudentFormInputs, updateStudentList
  */
 function submitData(){
-    console.log('submitData running');
-    debugger;
     var studentObject = updateStudentObject();
+    var inputsValid = checkCharacters();
 
+    if(inputsValid){
     $.ajax({
         type:'POST',
         url: 'http://localhost:8888/app.php/?request=submit_data',
@@ -109,16 +106,17 @@ function submitData(){
         },
         dataType: 'json',
         success: messageSent()
-    })
-
-    student_array.push(studentObject);
-    updateStudentList(student_array);
+    }).then(()=>{
+        clearAddStudentFormInputs();
+        getData();
+        clearInputWarning();
+        });
+    }
 }
 /***************************************************************************************************
  * clearAddStudentForm - clears out the form values based on inputIds variable
  */
 function clearAddStudentFormInputs(){
-    console.log('clearAddStudentFormInputs running');
     $('#studentName').val("");
     $('#course').val("");
     $('#studentGrade').val("");
@@ -129,16 +127,15 @@ function clearAddStudentFormInputs(){
  * @param {object} studentObj a single student object with course, name, and grade inside
  */
 function renderStudentOnDom(studentObj){
-    console.log('renderStudentOnDom running');
-    var studentNameElement = $('<td>').text(studentObj.student);
-    var studentCourseElement = $('<td>').text(studentObj.course);
-    var studentGradeElement = $('<td>').text(studentObj.grade);
+    var studentNameElement = $('<td>').text(studentObj.student).addClass('align-middle');
+    var studentCourseElement = $('<td>').text(studentObj.course).addClass('align-middle');
+    var studentGradeElement = $('<td>').text(studentObj.grade).addClass('align-middle');
     var studentID = studentObj.ID;
 
     var deleteButton = $('<i>').addClass('fas fa-trash-alt ml-2 deleteBtn');
     var editButton = $('<i>').addClass('fas fa-edit mr-2 editBtn');
 
-    var buttonTD = $('<td>').append(editButton, deleteButton);
+    var buttonTD = $('<td>').append(editButton, deleteButton).addClass('align-middle');
 
     var newStudentData = $('<tr>').addClass('text-center').append(studentNameElement, studentCourseElement, studentGradeElement, buttonTD).attr('id',studentID);;
 
@@ -156,7 +153,6 @@ function renderStudentOnDom(studentObj){
  */
 function updateStudentList(students){
     $('.student-list tbody').empty();
-    console.log('updateStudentList running');
     for(var i = 0; i < students.length; i++){
         renderStudentOnDom(students[i]);
     }
@@ -168,7 +164,6 @@ function updateStudentList(students){
  * @returns {number}
  */
 function calculateGradeAverage(array){
-    console.log('calculateGradeAverage running');
     var studentGradeSum = 0;
     for (var studentIndex = 0; studentIndex < array.length; studentIndex++){
         studentGradeSum = parseInt(studentGradeSum) + parseInt(array[studentIndex].grade);
@@ -182,7 +177,6 @@ function calculateGradeAverage(array){
  * @returns {undefined} none
  */
 function renderGradeAverage(average){
-    console.log('renderGradeAverage running');
     var roundedAverage = Math.round(average);
     $('.avgGrade.label.label-default').text(roundedAverage);
 }
@@ -194,7 +188,6 @@ function renderGradeAverage(average){
  */
 
 function handleGetDataClick(){
-    console.log('handleGetDataClick running');
     getData();
 }
 
@@ -205,7 +198,6 @@ function handleGetDataClick(){
  * @calls: updateStudentList
  */
 function getData(){
-    console.log('get data running');
     student_array = [];
     var ajaxConfig = {
         dataType: 'json',
@@ -213,9 +205,6 @@ function getData(){
         method: 'get',
         success:
             function(returnedObject) {
-            console.log('Success');
-            console.log('result', returnedObject);
-
             for (var i = 0; i < returnedObject.length; i++) {
                 var student_object = {
                     ID: returnedObject[i].ID,
@@ -226,9 +215,6 @@ function getData(){
                 student_array.push(student_object);
             }
             updateStudentList(student_array);
-        },
-        error: function(){
-            console.log('Failure');
         }}
 
     $.ajax(ajaxConfig);
@@ -242,7 +228,6 @@ function getData(){
  */
 
  function messageSent(){
-     console.log('Student data successfully sent.');
      clearAddStudentFormInputs();
  }
 
@@ -275,21 +260,29 @@ function updateClickHandlers(){
     $('.deleteBtn').off();
     $('.editBtn').off();
     $('.deleteBtn').on('click',function(event){
-        console.log('deleting..');
         var studentID = getStudentID(event.target);
-        $.ajax({
-            type:'POST',
-            url: 'http://localhost:8888/app.php/?request=delete_data',
-            data: {
-               ID:studentID
-            },
-            dataType: 'json'
-        }).then(getData);
-
+        $('#deleteModal').modal();
+        $('#confirmDelete').off();
+        $('#confirmDelete').click('on',()=>{
+            $.ajax({
+                type:'POST',
+                url: 'http://localhost:8888/app.php/?request=delete_data',
+                data: {
+                   ID:studentID
+                },
+                dataType: 'json'
+            }).then(()=>{
+                getData();
+                clearAddStudentFormInputs();
+                clearInputWarning();
+            });
+            $('#deleteModal').modal('hide')
+        })
     });
 
     $('.editBtn').on('click',function(event){
-        console.log('edit BTN clicked');
+        displayEditing();
+        window.scrollTo(0, 0);
         var studentID = getStudentID(event.target);
         var student = $('#' + studentID + ' td:nth-child(1)').text();
         var course =  $('#' + studentID + ' td:nth-child(2)').text();
@@ -322,6 +315,11 @@ function getStudentID(e){
  */
 function updateData(studentID){
     var studentObject = updateStudentObject();
+
+    var inputsValid = checkCharacters();
+    console.log('inputs', inputsValid);
+
+    if(inputsValid){
     $.ajax({
         type:'POST',
         url: 'http://localhost:8888/app.php/?request=update_data',
@@ -334,9 +332,11 @@ function updateData(studentID){
         dataType: 'json'
 }).then(()=>{
     clearAddStudentFormInputs();
+    clearInputWarning();
     changeSubmitButton();
     getData();
     });
+}
 }
 
  /***************************************************************************************************
@@ -346,6 +346,7 @@ function updateData(studentID){
  * @calls:
  */
 function changeSubmitButton(){
+    $('#formHead').text('Add Student');
     $('#submitData').off();
     $('#submitData').on('click',handleSubmitClicked);
     $('#submitData').removeClass('btn-info');
@@ -359,6 +360,7 @@ function changeSubmitButton(){
  * @calls:
  */
 function changeUpdateButton(studentID){
+    $('#formHead').text('Edit Student');
     $('#submitData').off();
     $('#submitData').removeClass('btn-primary');
     $('#submitData').addClass('btn-info');
@@ -367,5 +369,80 @@ function changeUpdateButton(studentID){
         updateData(studentID);
     });
 }
+ /***************************************************************************************************
+ * checkCharacters - Tests inputs using regex to confirm valid
+ * @param: {undefined} none
+ * @returns: {undefined} none
+ * @calls:
+ */
+function checkCharacters(){
+    var testStatus = false;
+    var student = $('#studentName').val();
+    console.log(student);
+    var course = $('#course').val();
+    var grade = $('#studentGrade').val();
 
+    var textRegex = /^[a-zA-Z\d ]{2,20}$/;
+    var numberRegex = /^[\d]{1,3}$/;
 
+    var testStudent = textRegex.test(student);
+    var testCourse = textRegex.test(course);
+    var testGrade = numberRegex.test(grade);
+    var testObject = {name: testStudent,
+                     course: testCourse,
+                     grade: testGrade};
+
+    if(testStudent && testCourse && testGrade){
+        testStatus = true;
+    }else{
+        displayInputWarning(testObject);
+    }
+    return testStatus;
+}
+ /***************************************************************************************************
+ * displayInputWarning - Adds red borders to form and warns user to edit inputs to meet requirements.
+ * @param: {undefined} none
+ * @returns: {undefined} none
+ * @calls:
+ */
+function displayInputWarning(testObject){
+    clearInputWarning();
+    $.each(testObject, function(key, value) {
+        if(!value){
+            $('.'+key+'InputInvalid').removeClass('d-none')
+            $('.'+key+'-group-text').addClass('invalid-border invalid-background');
+            $('.'+key+'-input').addClass('invalid-border');
+            $('.'+key+'-group').addClass('mb-0 mt-0');
+    
+        } else {
+            $('.'+key+'InputValid').removeClass('d-none')
+            $('.'+key+'-group').addClass('mb-0 mt-0');
+            $('.'+key+'-group-text').addClass('valid-border valid-background');
+            $('.'+key+'-input').addClass('valid-border');
+        }
+    });
+    
+    
+}
+ /***************************************************************************************************
+ * clearInputWarning - Adds red borders to form and warns user to edit inputs to meet requirements.
+ * @param: {undefined} none
+ * @returns: {undefined} none
+ * @calls:
+ */
+function clearInputWarning(){
+    $('.validationText').addClass('d-none');
+    $('.form-group').removeClass('mb-0 mt-0');
+    $('.input-group-text').removeClass('valid-border valid-background invalid-border invalid-background edit-border edit-background');
+    $('input').removeClass('valid-border invalid-border edit-border');
+}
+ /***************************************************************************************************
+ * displayEditing - Adds blue borders to indicate input is being edited
+ * @param: {undefined} none
+ * @returns: {undefined} none
+ * @calls:
+ */
+function displayEditing(){
+    $('.input-group-text').addClass('edit-border edit-background');
+    $('input').addClass('edit-border');
+}

@@ -1,2 +1,35 @@
 .highlight { 
     background-color: aquamarine; }
+
+td {
+    vertical-align: middle;
+}
+
+.invalid-border{
+    border: 1px solid red;
+}
+
+.invalid-background{
+    background-color: #ffb7b7;
+}
+
+.valid-border{
+    border: 1px solid green;
+}
+
+.valid-background{
+    background-color: #D4FFD3;
+}
+
+.clearMargin{
+    margin: 0;
+}
+
+.edit-border{
+    border: 1px solid blue;
+} 
+
+.edit-background{
+    background-color: #17a2b8;
+    color: white;
+}
