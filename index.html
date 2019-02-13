@@ -7,109 +7,119 @@
     <meta name="viewport" content="initial-scale=1, user-scalable=no">
     <link rel="stylesheet" href="stylesheet.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 </head>
 <body>
     <div class="container-fluid">
-            <div class="col col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                    <!-- only show this element when the isnt on mobile -->
+            <div class="col col-sm-12 col-md-12 col-lg-12 pl-0 pr-0">
                     <h3 class="hidden-xs hidden-sm page-header">Student Grade Table
                         <small class="float-right">Grade Average : <span class="avgGrade label label-default"></span></small>
                     </h3>
-                    <!-- only show this element when the user gets to a mobile version -->
-                    <!-- <h3 class="hidden-md hidden-lg page-header col-xs-12">Student Grade Table
-                        <small class="float-right">Grade Average : <span class="avgGrade label label-default"></span></small>
-                    </h3> -->
                 </div>
             <div class="row">
-                <div class="d-inline-block col col-xs-8 col-sm-8 col-md-8 col-lg-8 student-list-container">
-                        <table class="table student-list">
-                            <thead>
-                            <tr class="text-center main-headers">
-                                <th>Student Name</th>
-                                <th>Course</th>
-                                <th>Grade</th>
-                                <th>Operations</th>
-                            </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-
-                    <div class="clearfix visible-xs-block"></div>
-
-                    <div class="d-inline-block col-xs-4 col-sm-4 col-md-4 col-lg-4">
-                            <h5>Add Student</h5>    
-                            <form>
-                                <div class="form-group"> 
+                <div class="col-lg-4 order-lg-12">
+                        <h5 id="formHead">Add Student</h5>    
+                        <form>
+                            <div class="form-group name-group"> 
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                            <span class="input-group-text name-group-text">
+                                                <i class="fas fa-user"></i>
+                                            </span>
+                                    </div>
+                                    <input type="text" name="studentName" class="form-control name-input" id="studentName" placeholder="Student Name">
+                                </div>
+                            </div>
+                            <div class="d-none nameInputInvalid text-danger validationText mb-1 mt-1">
+                                <i class="fas fa-exclamation-circle"></i>
+                                Name must be between 2 to 20 alphanumeric (a-z, A-Z, 0-9) characters long.
+                            </div>
+                            <div class="d-none nameInputValid validationText text-success mb-1 mt-1">
+                                <i class="fas fa-check-circle"></i>
+                                Input valid.
+                            </div>
+                            <div class="form-group course-group">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                            <span class="input-group-text course-group-text">
+                                                <i class="fas fa-book"></i>
+                                            </span>
+                                    </div>
+                                    <input type="text" class="form-control course-input" name="course" id="course" placeholder="Course Name">
+                                </div>
+                            </div>
+                            <div class="d-none courseInputInvalid validationText text-danger mb-1 mt-1">
+                                <i class="fas fa-exclamation-circle"></i>
+                                Name must be between 2 to 20 alphanumeric (a-z, A-Z, 0-9) characters long.
+                            </div>
+                            <div class="d-none courseInputValid validationText text-success mb-1 mt-1">
+                                <i class="fas fa-check-circle"></i>
+                                Input valid.
+                            </div>
+                            <div class="form-group grade-group">
                                     <div class="input-group">
                                         <div class="input-group-prepend">
-                                                <span class="input-group-text">
-                                                    <i class="fas fa-user"></i>
-                                                </span>
-                                        </div>
-                                        <input type="text" name="studentName" class="form-control" id="studentName" placeholder="Student Name">
+                                            <span class="input-group-text grade-group-text">
+                                                <i class="fas fa-marker"></i>
+                                            </span>
                                     </div>
+                                    <input type="text" class="form-control grade-input" name="studentGrade" id="studentGrade" placeholder="Grade">
                                 </div>
+                            </div>
+                            <div class="d-none gradeInputInvalid validationText text-danger mb-1 mt-1">
+                                <i class="fas fa-exclamation-circle"></i>
+                                Name must be between 1 to 3 numeric (0-9) characters long.
+                            </div>
+                            <div class="d-none gradeInputValid validationText text-success mb-1 mt-1">
+                                <i class="fas fa-check-circle"></i>
+                                Input valid.
+                            </div>
+                                <!-- Submit GetData and Cancel Buttons -->
                                 <div class="form-group">
-                                        <div class="input-group">
-                                            <div class="input-group-prepend">
-                                                    <span class="input-group-text">
-                                                        <i class="fas fa-book"></i>
-                                                    </span>
-                                            </div>
-                                            <input type="text" class="form-control" name="course" id="course" placeholder="Course Name">
+                                        <button type="button" class="btn btn-primary" id="submitData">Submit</button>
+                                        <button type="button" class="btn btn-success" id="getData">Get Data</button>
+                                        <button type="button" class="btn btn-secondary" id="cancel">Cancel</button>
                                         </div>
-                                    </div>
-                                    <div class="form-group">
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text">
-                                                        <i class="fas fa-graduation-cap"></i>
-                                                    </span>
-                                            </div>
-                                            <input type="text" class="form-control" name="studentGrade" id="studentGrade" placeholder="Grade">
-                                        </div>
-                                    </div>
-                                    <!-- Submit GetData and Cancel Buttons -->
-                                    <div class="form-group">
-                                            <button type="button" class="btn btn-primary" id="submitData">Submit</button>
-                                            <button type="button" class="btn btn-success" id="getData">Get Data</button>
-                                            <button type="button" class="btn btn-secondary" id="cancel">Cancel</button>
-                                          </div>
-                                    </div>
+                                </div>
+
+                                <div class="clearfix visible-xs-block"></div>
+
+                                <div class="col col-lg-8 student-list-container order-lg-1">
+                                    <table class="table student-list">
+                                        <thead>
+                                        <tr class="text-center main-headers">
+                                            <th>Name</th>
+                                            <th>Course</th>
+                                            <th>Grade</th>
+                                            <th>Operations</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
                             </form>
                     </div>
             </div>
             
     </div>
 
-<!-- Modal to edit any submissions -->
-    <div class="modal fade mx-auto clearBorder" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModal" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered clearBorder" role="document">
-            <div class="modal-content clearBorder">
-                <div class="modal-header clearBorder waterColorBackground">
-                    <h5 class="modal-title font-weight-bold clearBorder">Login</h5>
+<!-- Confirm Delete Modal -->
+    <div class="modal fade mx-auto" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModal" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content border-0">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title font-weight-bold">Confirm Delete</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                </button>
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                 </div>
-                <div class="modal-body clearBorder pb-0">
-                    <form>
-                        <div class="form-group">
-                            <label for="usernameInput">Username</label>
-                            <input type="text" class="form-control login" name="username" aria-describedby="emailHelp" id = 'aD' placeholder="Please enter username">
-                            </div>
-    
-                            <div class="form-group">
-                                <label for="passwordInput">Password</label>
-                                <input type="text" class="form-control login" name="password" aria-describedby="emailHelp" placeholder="Please enter password">
-                            </div>
-                       
-                    </form>
+                <div class="modal-body bg-light">
+                    Please select <b>Delete</b> if you are sure you want to delete the row. Otherwise, please select <b>Close</b>.
                 </div>
-                <div class="modal-footer clearBorder pt-0 rounded-bottom">
+                <div class="modal-footer bg-light pt-0 rounded-bottom border-0">
+                <button id="confirmDelete" type="button" class="btn btn-danger">Delete</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button id="loginSubmit" type="button" class="btn btn-primary">Submit</button>
                 </div>
             </div>
             </div>
