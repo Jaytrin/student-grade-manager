@@ -178,6 +178,9 @@ function calculateGradeAverage(array){
  */
 function renderGradeAverage(average){
     var roundedAverage = Math.round(average);
+    if(isNaN(roundedAverage)){
+        roundedAverage = '\[No Data\]';
+    }
     $('.avgGrade.label.label-default').text(roundedAverage);
 }
 /***************************************************************************************************
@@ -215,7 +218,8 @@ function getData(){
                 student_array.push(student_object);
             }
             updateStudentList(student_array);
-        }}
+        }
+    }
 
     $.ajax(ajaxConfig);
     }
@@ -260,6 +264,8 @@ function updateClickHandlers(){
     $('.deleteBtn').off();
     $('.editBtn').off();
     $('.deleteBtn').on('click',function(event){
+        $(event.target).parent().parent().removeClass('highlight');
+        highlightSection();
         var studentID = getStudentID(event.target);
         $('#deleteModal').modal();
         $('#confirmDelete').off();
@@ -283,6 +289,8 @@ function updateClickHandlers(){
     $('.editBtn').on('click',function(event){
         displayEditing();
         window.scrollTo(0, 0);
+        $(event.target).parent().parent().removeClass('highlight');
+        highlightSection();
         var studentID = getStudentID(event.target);
         var student = $('#' + studentID + ' td:nth-child(1)').text();
         var course =  $('#' + studentID + ' td:nth-child(2)').text();
@@ -317,7 +325,6 @@ function updateData(studentID){
     var studentObject = updateStudentObject();
 
     var inputsValid = checkCharacters();
-    console.log('inputs', inputsValid);
 
     if(inputsValid){
     $.ajax({
@@ -378,7 +385,6 @@ function changeUpdateButton(studentID){
 function checkCharacters(){
     var testStatus = false;
     var student = $('#studentName').val();
-    console.log(student);
     var course = $('#course').val();
     var grade = $('#studentGrade').val();
 
