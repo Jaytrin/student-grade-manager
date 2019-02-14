@@ -18,6 +18,8 @@ var student_array = [];
 */
 function initializeApp(){
     addClickHandlersToElements();
+    console.log('initialized');
+    getData();
 }
 
 
@@ -30,7 +32,6 @@ function initializeApp(){
 function addClickHandlersToElements(){
     $('#submitData').on('click',handleSubmitClicked);
     $('#cancel').on('click',handleCancelClick);
-    $('#getData').on('click',handleGetDataClick);
 }
 
 /***************************************************************************************************
@@ -86,7 +87,7 @@ function submitData(){
     if(inputsValid){
     $.ajax({
         type:'POST',
-        url: 'http://localhost:8888/app.php/?request=submit_data',
+        url: 'http://studentgrademanager.jaytrin.com/app.php/?request=submit_data',
         data: {
             student: studentObject.student,
             course: studentObject.course,
@@ -171,16 +172,6 @@ function renderGradeAverage(average){
     }
     $('.avgGrade.label.label-default').text(roundedAverage);
 }
-/***************************************************************************************************
- * handleGetDataClick - Event Handler when user clicks the get data button, should pull records from DB
- * @param: {undefined} none
- * @returns: {undefined} none
- * @calls: getData
- */
-
-function handleGetDataClick(){
-    getData();
-}
 
 /***************************************************************************************************
  * getData - Functino that gets data from the database
@@ -192,7 +183,7 @@ function getData(){
     student_array = [];
     var ajaxConfig = {
         dataType: 'json',
-        url: 'http://localhost:8888/app.php/?request=get_data',
+        url: 'http://studentgrademanager.jaytrin.com/app.php/?request=get_data',
         method: 'get',
         success:
             function(returnedObject) {
@@ -260,7 +251,7 @@ function updateClickHandlers(){
         $('#confirmDelete').click('on',()=>{
             $.ajax({
                 type:'POST',
-                url: 'http://localhost:8888/app.php/?request=delete_data',
+                url: 'http://studentgrademanager.jaytrin.com/app.php/?request=delete_data',
                 data: {
                    ID:studentID
                 },
@@ -317,7 +308,7 @@ function updateData(studentID){
     if(inputsValid){
     $.ajax({
         type:'POST',
-        url: 'http://localhost:8888/app.php/?request=update_data',
+        url: 'http://studentgrademanager.jaytrin.com/app.php/?request=update_data',
         data: {
         ID:studentID,
         student:studentObject.student,
