@@ -121,7 +121,7 @@ function clearAddStudentFormInputs(){
 function renderStudentOnDom(studentObj){
     var studentNameElement = $('<td>').text(studentObj.student).addClass('align-middle');
     var studentCourseElement = $('<td>').text(studentObj.course).addClass('align-middle');
-    var studentGradeElement = $('<td>').text(studentObj.grade).addClass('align-middle');
+    var studentGradeElement = $('<td>').text(studentObj.grade).addClass('align-middle grade');
     var studentID = studentObj.ID;
 
     var deleteButton = $('<i>').addClass('fas fa-trash-alt ml-2 deleteBtn');
@@ -375,12 +375,18 @@ function checkCharacters(){
     var course = $('#course').val();
     var grade = $('#studentGrade').val();
 
-    var textRegex = /^[a-zA-Z\d ]{2,20}$/;
-    var numberRegex = /^[\d]{1,3}$/;
+    var textRegex = /^(?![ -])(?!.*[ -]$)(?!.*[ -]{2})[a-zA-Z\d \-]{2,20}$/;
+    var nameRegex = /^(?![ -])(?!.*[ -]$)(?!.*[ -]{2})[a-zA-Z \-]{2,20}$/;
+    var numberRegex = /^(?![ ])[\d]{1,3}$/;
 
-    var testStudent = textRegex.test(student);
+    var testStudent = nameRegex.test(student);
     var testCourse = textRegex.test(course);
     var testGrade = numberRegex.test(grade);
+
+    if(grade > 150){
+        testGrade = false;
+    }
+
     var testObject = {name: testStudent,
                      course: testCourse,
                      grade: testGrade};
@@ -400,13 +406,13 @@ function checkCharacters(){
  */
 function displayInputWarning(testObject){
     clearInputWarning();
+    $('#loadingGif').addClass('d-none');
     $.each(testObject, function(key, value) {
         if(!value){
             $('.'+key+'InputInvalid').removeClass('d-none')
             $('.'+key+'-group-text').addClass('invalid-border invalid-background');
             $('.'+key+'-input').addClass('invalid-border');
             $('.'+key+'-group').addClass('mb-0 mt-0');
-    
         } else {
             $('.'+key+'InputValid').removeClass('d-none')
             $('.'+key+'-group').addClass('mb-0 mt-0');
