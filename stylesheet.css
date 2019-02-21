@@ -36,7 +36,6 @@ td {
 
 .container-fluid{
     height: 100vh;
-    overflow: fixed;
 }
 
 .main-section{
@@ -56,8 +55,22 @@ img.title-width{
     width: 100%;
 }
 
-@media screen and (max-width: 575.99px) {
+@media screen and (max-width: 425px) {
 
+    table{
+        font-size: .75rem;
+    }
+  
+    td.align-middle{
+        padding: 0 6px;
+    }
+  
+    #formHead{
+        font-size: 1rem;
+    }
+  }
+
+@media screen and (max-width: 574.99px) {
   table{
       font-size: .75rem;
   }
@@ -73,6 +86,10 @@ img.title-width{
   .custom-title{
       font-size: 1.5rem;
   }
+
+  h6, .custom-title{
+    padding-top:0;
+  }
 }
 
 @media screen and (min-width: 575px) {
@@ -82,27 +99,6 @@ img.title-width{
 }
 
 
-@media screen and (max-width: 425px) {
-
-    table{
-        font-size: .75rem;
-    }
-  
-    td.align-middle{
-        padding: 0 6px;
-    }
-  
-    #formHead{
-        font-size: 1rem;
-    }
-  
-  }
-
-  @media screen and (max-width: 575.99px) {
-    h6, .custom-title{
-        padding-top:0;
-    }
-}
 
 @media screen and (min-width: 768px) {
     h6{
@@ -110,7 +106,7 @@ img.title-width{
         text-align:right;
         padding-right: 0;
         font-size:1.1rem;
-}
+    }
 }
 
 @media screen and (min-width: 992px) {
@@ -128,6 +124,16 @@ img.title-width{
     }
 }
 
+td.grade{
+    text-align: right;
+    width: 10px;
+}
+
+
 #loadingGif{
     height: 2.25rem;
+}
+
+i, button{
+    cursor: pointer;
 }
