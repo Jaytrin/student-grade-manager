@@ -18,7 +18,7 @@ var student_array = [];
 */
 function initializeApp(){
     addClickHandlersToElements();
-    console.log('initialized');
+    $('#loadingGif').removeClass('d-none');
     getData();
 }
 
@@ -53,6 +53,7 @@ function handleCancelClick(){
     clearAddStudentFormInputs();
     changeSubmitButton();
     clearInputWarning();
+    $('#loadingGif').addClass('d-none');
 }
 
  /***************************************************************************************************
@@ -81,13 +82,14 @@ function updateStudentObject(){
  * @calls clearAddStudentFormInputs, updateStudentList
  */
 function submitData(){
+    $('#loadingGif').removeClass('d-none');
     var studentObject = updateStudentObject();
     var inputsValid = checkCharacters();
 
     if(inputsValid){
     $.ajax({
         type:'POST',
-        url: 'http://studentgrademanager.jaytrin.com/app.php/?request=submit_data',
+        url: 'http://localhost:8888/app.php/?request=submit_data',
         data: {
             student: studentObject.student,
             course: studentObject.course,
@@ -99,6 +101,7 @@ function submitData(){
         clearAddStudentFormInputs();
         getData();
         clearInputWarning();
+        $('#loadingGif').addClass('d-none');
         });
     }
 }
@@ -183,7 +186,7 @@ function getData(){
     student_array = [];
     var ajaxConfig = {
         dataType: 'json',
-        url: 'http://studentgrademanager.jaytrin.com/app.php/?request=get_data',
+        url: 'http://localhost:8888/app.php/?request=get_data',
         method: 'get',
         success:
             function(returnedObject) {
@@ -197,6 +200,7 @@ function getData(){
                 student_array.push(student_object);
             }
             updateStudentList(student_array);
+            $('#loadingGif').addClass('d-none');
         }
     }
 
@@ -249,9 +253,10 @@ function updateClickHandlers(){
         $('#deleteModal').modal();
         $('#confirmDelete').off();
         $('#confirmDelete').click('on',()=>{
+            $('#loadingGif').removeClass('d-none');
             $.ajax({
                 type:'POST',
-                url: 'http://studentgrademanager.jaytrin.com/app.php/?request=delete_data',
+                url: 'http://localhost:8888/app.php/?request=delete_data',
                 data: {
                    ID:studentID
                 },
@@ -260,8 +265,9 @@ function updateClickHandlers(){
                 getData();
                 clearAddStudentFormInputs();
                 clearInputWarning();
+            $('#loadingGif').addClass('d-none');
             });
-            $('#deleteModal').modal('hide')
+            $('#deleteModal').modal('hide');
         })
     });
 
@@ -301,6 +307,7 @@ function getStudentID(e){
  * @calls: updateStudentObject,clearAddStudentFormInputs, changeSubmitButton, getData
  */
 function updateData(studentID){
+    $('#loadingGif').removeClass('d-none');
     var studentObject = updateStudentObject();
 
     var inputsValid = checkCharacters();
@@ -308,7 +315,7 @@ function updateData(studentID){
     if(inputsValid){
     $.ajax({
         type:'POST',
-        url: 'http://studentgrademanager.jaytrin.com/app.php/?request=update_data',
+        url: 'http://localhost:8888/app.php/?request=update_data',
         data: {
         ID:studentID,
         student:studentObject.student,
@@ -321,6 +328,7 @@ function updateData(studentID){
     clearInputWarning();
     changeSubmitButton();
     getData();
+    $('#loadingGif').addClass('d-none');
     });
 }
 }

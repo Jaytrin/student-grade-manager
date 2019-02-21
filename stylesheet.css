@@ -36,7 +36,7 @@ td {
 
 .container-fluid{
     height: 100vh;
-    overflow: scroll;
+    overflow: fixed;
 }
 
 .main-section{
@@ -111,6 +111,7 @@ img.title-width{
         padding-right: 0;
         font-size:1.1rem;
 }
+}
 
 @media screen and (min-width: 992px) {
     table.student-list{
@@ -125,4 +126,8 @@ img.title-width{
     .custom-border{
         margin: 5px;
     }
+}
+
+#loadingGif{
+    height: 2.25rem;
 }
