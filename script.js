@@ -54,6 +54,8 @@ function handleCancelClick(){
     changeSubmitButton();
     clearInputWarning();
     $('#loadingGif').addClass('d-none');
+    $('tr').removeClass('highlight');
+    $('.editTab').addClass('d-none');
 }
 
  /***************************************************************************************************
@@ -133,8 +135,8 @@ function renderStudentOnDom(studentObj){
 
     $('.student-list tbody').append(newStudentData);
 
-    updateClickHandlers();
-    highlightSection();
+    // updateClickHandlers();
+    // highlightSection();
 }
 
 /***************************************************************************************************
@@ -149,6 +151,7 @@ function updateStudentList(students){
         renderStudentOnDom(students[i]);
     }
     renderGradeAverage(calculateGradeAverage(students));
+    updateClickHandlers();
 }
 /***************************************************************************************************
  * calculateGradeAverage - loop through the global student array and calculate average grade and return that value
@@ -224,16 +227,18 @@ function getData(){
  * @returns: {undefined} none
  * @calls:
  */
- function highlightSection(){
-    $('tr').off();
-    $('tr').on('click',function(){
-        var highlighted = $(this).hasClass("highlight");
-        var mainHeader = $(this).hasClass("main-headers");
-        $('tr').removeClass("highlight");
-        if(!mainHeader && !highlighted){
-            $(this).addClass("highlight");
-            }
-    });
+ function highlightSection(target){
+    $('tr').removeClass('highlight');
+    $(target).parent().parent().addClass('highlight');
+    // $('i.editBtn').off();
+    // $('i.editBtn').on('click',function(){
+    //     var highlighted = $(this).parent().parent().hasClass("highlight");
+    //     var mainHeader = $(this).parent().parent().hasClass("main-headers");
+    //     $('tr').removeClass("highlight");
+    //     if(!mainHeader && !highlighted){
+    //         $(this).parent().parent().addClass("highlight");
+    //         }
+    // });
 }
 
  /***************************************************************************************************
@@ -247,8 +252,8 @@ function updateClickHandlers(){
     $('.deleteBtn').off();
     $('.editBtn').off();
     $('.deleteBtn').on('click',function(event){
-        $(event.target).parent().parent().removeClass('highlight');
-        highlightSection();
+        // $(event.target).parent().parent().removeClass('highlight');
+        highlightSection(event.target);
         var studentID = getStudentID(event.target);
         $('#deleteModal').modal();
         $('#confirmDelete').off();
@@ -272,10 +277,14 @@ function updateClickHandlers(){
     });
 
     $('.editBtn').on('click',function(event){
+        $('.editTab').removeClass('d-none');
         displayEditing();
-        window.scrollTo(0, 0);
-        $(event.target).parent().parent().removeClass('highlight');
-        highlightSection();
+        window.scrollTo({
+            top: 100,
+            left: 100,
+            behavior: 'smooth'});
+        // $(event.target).parent().parent().removeClass('highlight');
+        highlightSection(event.target);
         var studentID = getStudentID(event.target);
         var student = $('#' + studentID + ' td:nth-child(1)').text();
         var course =  $('#' + studentID + ' td:nth-child(2)').text();
@@ -308,6 +317,7 @@ function getStudentID(e){
  */
 function updateData(studentID){
     $('#loadingGif').removeClass('d-none');
+    $('.editTab').addClass('d-none');
     var studentObject = updateStudentObject();
 
     var inputsValid = checkCharacters();
