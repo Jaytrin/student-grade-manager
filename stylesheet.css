@@ -1,5 +1,8 @@
 .highlight { 
-    background-color: aquamarine; }
+    color: white;
+    font-weight: 500;
+    background-color: #de5a69;
+}
 
 td {
     vertical-align: middle;
@@ -26,12 +29,12 @@ td {
 }
 
 .edit-border{
-    border: 1px solid mediumaquamarine;
+    border: 1px solid #e0e2e6;
 } 
 
 .edit-background{
-    background-color: #17a2b8;
     color: white;
+    background-color: #de5a69;
 }
 
 .container-fluid{
@@ -111,7 +114,7 @@ img.title-width{
 
 @media screen and (min-width: 992px) {
     .editTab {
-        margin-left: 5px;
+        margin-right: 5px;
     }
 
     table.student-list{
@@ -145,7 +148,19 @@ i, button{
 .editTab {
     text-align: center;
     width: 6rem;
-    background-color: black;
+    background-color: #de5a69;
     color: white;
     font-weight: bold;
+    border: 3px solid #e2e4e8;
+    float: right;
+}
+
+.btn-pencil{
+    background-color: #f09035;
+    color: white;
+    border: 1px solid #f07500;
+}
+
+.errorHandler{
+    color: red;
 }
