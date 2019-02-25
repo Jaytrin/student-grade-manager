@@ -32,6 +32,9 @@ function initializeApp(){
 function addClickHandlersToElements(){
     $('#submitData').on('click',handleSubmitClicked);
     $('#cancel').on('click',handleCancelClick);
+    $('#deleteModal').on('hidden.bs.modal', function () {
+        $('tr').removeClass('highlight');
+    });
 }
 
 /***************************************************************************************************
@@ -42,6 +45,7 @@ function addClickHandlersToElements(){
  */
 function handleSubmitClicked(){
     submitData();
+    $('.errorHandler').addClass('d-none');
 }
 /***************************************************************************************************
  * handleCancelClicked - Event Handler when user clicks the cancel button, should clear out student form
@@ -50,6 +54,7 @@ function handleSubmitClicked(){
  * @calls: clearAddStudentFormInputs
  */
 function handleCancelClick(){
+    $('.errorHandler').addClass('d-none');
     clearAddStudentFormInputs();
     changeSubmitButton();
     clearInputWarning();
@@ -98,7 +103,8 @@ function submitData(){
             grade: studentObject.grade
         },
         dataType: 'json',
-        success: messageSent()
+        success: messageSent,
+        error: displayError
     }).then(()=>{
         clearAddStudentFormInputs();
         getData();
@@ -204,7 +210,8 @@ function getData(){
             }
             updateStudentList(student_array);
             $('#loadingGif').addClass('d-none');
-        }
+        },
+        error: displayError
     }
 
     $.ajax(ajaxConfig);
@@ -265,7 +272,8 @@ function updateClickHandlers(){
                 data: {
                    ID:studentID
                 },
-                dataType: 'json'
+                dataType: 'json',
+                error: displayError
             }).then(()=>{
                 getData();
                 clearAddStudentFormInputs();
@@ -332,6 +340,7 @@ function updateData(studentID){
         course:studentObject.course,
         grade:studentObject.grade
         },
+        error:displayError,
         dataType: 'json'
 }).then(()=>{
     clearAddStudentFormInputs();
@@ -353,7 +362,7 @@ function changeSubmitButton(){
     $('#formHead').text('Add Student');
     $('#submitData').off();
     $('#submitData').on('click',handleSubmitClicked);
-    $('#submitData').removeClass('btn-info');
+    $('#submitData').removeClass('btn-pencil');
     $('#submitData').addClass('btn-primary');
     $('#submitData').text('Submit');
 }
@@ -367,7 +376,7 @@ function changeUpdateButton(studentID){
     $('#formHead').text('Edit Student');
     $('#submitData').off();
     $('#submitData').removeClass('btn-primary');
-    $('#submitData').addClass('btn-info');
+    $('#submitData').addClass('btn-pencil');
     $('#submitData').text('Update');
     $('#submitData').on('click',()=> {
         updateData(studentID);
@@ -454,4 +463,15 @@ function clearInputWarning(){
 function displayEditing(){
     $('.input-group-text').addClass('edit-border edit-background');
     $('input').addClass('edit-border');
+}
+
+ /***************************************************************************************************
+ * displayError - Error handling when data cannot be retrieved
+ * @param: {undefined} none
+ * @returns: {undefined} none
+ * @calls:
+ */
+function displayError(){
+    $('.errorHandler').removeClass('d-none');
+    setTimeout(()=>{$('.errorHandler').addClass('d-none')},5000)
 }
